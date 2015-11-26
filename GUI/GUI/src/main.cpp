@@ -16,8 +16,7 @@
 #define START_X 30			// Start Map point Left Top
 #define START_Y 60
 #define NUM_CHARACTER_IMAGE 6
-#define NUM_MAP_IMAGE 2
-#define MAX_NPC 2
+#define NUM_MAP_IMAGE 9
 
 HDC			hDC = NULL;		// Private GDI Device Context
 HGLRC		hRC = NULL;		// Permanent Rendering Context
@@ -29,49 +28,66 @@ bool	keys[256];			// Array Used For The Keyboard Routine
 bool	active = true;		// Window Active Flag Set To ture By Default
 bool	fullscreen = true;	// Fullscreen Flag Set To Fullscreen Mode By Default
 
-							/* bool for game */
-bool	ap;					// 'A' Key Pressed?
-bool	anti = true;		// Antialiasing?
-
 int		loop1;				// Generic Loop1
 int		loop2;				// Generic Loop2
-int		count = LENGTH;
 
-char path_char[NUM_CHARACTER_IMAGE][30] = 
-		  { { "image/Gi_U0.bmp" },				// 지우 DOWN
-			{ "image/Gi_U1.bmp" },				// 지우 LEFT
-			{ "image/Gi_U2.bmp" },				// 지우 UP
-			{ "image/Gi_U3.bmp" },				// 지우 RIGTH
-			{ "image/object_grass.bmp" },
-			{ "image/Ganhosun.bmp" } };		// 캐릭터 풀 애니메이션
+char path_char[NUM_CHARACTER_IMAGE][63] = 
+		  { { "image/object/Gi_U0.bmp" },				// 지우 DOWN
+			{ "image/object/Gi_U1.bmp" },				// 지우 LEFT
+			{ "image/object/Gi_U2.bmp" },				// 지우 UP
+			{ "image/object/Gi_U3.bmp" },				// 지우 RIGTH
+			{ "image/object/object_grass.bmp" },		// 캐릭터 풀 애니메이션
+			{ "image/object/Ganhosun.bmp" } };		
 
-char path_map[NUM_MAP_IMAGE][30] =
-		  { { "image/icon.bmp" },
-			{ "image/senter.bmp"} };
+char path_map[NUM_MAP_IMAGE][31] =
+		  { { "image/map/icon.bmp" },
+			{ "image/map/senter.bmp"},
+			{ "image/map/home.bmp"},
+			{ "image/intro/intro1.bmp" },
+			{ "image/intro/intro2.bmp" },
+			{ "image/intro/intro3.bmp" },
+			{ "image/intro/intro4.bmp" },
+			{ "image/intro/intro5.bmp" },
+			{ "image/intro/intro6.bmp" } };
 
 int map_DB[NUM_MAP_IMAGE][165] =
- { {1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-	0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1,
-	0, 0, 0, 1, 0, 0, 0, 0, 105093, 0, 0, 0, 1, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1,
-	1, 1, 1, 1, 1, 64, 1, 0, 1, 1, 1, 1, 0, 0, 1,
-	1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-	1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1,
-	1, 1, 0, 0, 8053, 8053, 0, 0, 0, 0, 0, 0, 0, 1, 1 } };
+{ {1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 0, 0, 206093, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+   0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1,
+   0, 0, 0, 1, 0, 0, 0, 0, 105093, 0, 0, 0, 1, 0, 0,
+   0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   0, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   0, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1,
+   1, 1, 1, 1, 1, 64, 1, 0, 1, 1, 1, 1, 0, 0, 1,
+   1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1,
+   1, 1, 0, 0, 8053, 8053, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+ { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,
+   1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+   1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+   1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1,
+   1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1,
+   1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1,
+   1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1,
+   1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+   1, 1, 1, 0, 0, 3023, 3023, 0, 0, 0, 0, 0, 0, 1, 1 },
+   {},
+   {},
+   {},
+   {} };
 
 /* Texture */
 GLuint	texture_char[NUM_CHARACTER_IMAGE];			// 캐릭터 이미지 저장
@@ -79,8 +95,17 @@ GLuint	texture_map[NUM_MAP_IMAGE];					// 맵 이미지 저장
 GLuint	texture_font[1];
 GLuint	base;
 
+
 int		adjust = 0;									// 속도 조절
 int		steps[6] = { 1, 2, 4, 5, 10, 20 };			// 한번에 실행할 픽셀 수 조절. adjust로 정함.
+int		count = LENGTH;
+int		animation = 0;
+
+
+bool	intro = true;
+bool	wait = true;
+bool	interrupt = true;									// 외부 입력이 들어오거나 z키를 눌렀을때 반응하면 true
+
 
 /* Unit */
 object player;										// 플레이어 선언
@@ -238,11 +263,6 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 
 	glLoadIdentity();									// Reset The View
 
-	if (anti)
-	{
-		glEnable(GL_LINE_SMOOTH);
-	}
-
 	// map
 	glLoadIdentity();													// Reset The Modelview Matrix
 	glEnable(GL_TEXTURE_2D);																	//glTranslatef(-player.fx + 14 * LENGTH + START_X * 1.0f, -player.fy + 10 * LENGTH + START_Y * 1.0f, 0.0f);	// Move To The Fine Player Position
@@ -344,8 +364,8 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 				8.4 * LENGTH + START_Y * 1.0f, 0, 
 				"FIGHT  $");
 		glPrint(9 * LENGTH + START_X * 1.0f,
-			9.3 * LENGTH + START_Y * 1.0f, 0,
-			"PACK   RUN");
+				9.3 * LENGTH + START_Y * 1.0f, 0,
+				"PACK   RUN");
 		glDisable(GL_BLEND);
 	}
 	return true;
@@ -627,7 +647,6 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 	timer	Timer;
 	MSG		msg;									// Windows message Structure
 	bool	done = false;							// Bool Variable To Exit Loop
-
 													// Ask The User Which Screen Mode They Prefer
 	if (MessageBox(NULL, "Would You Like To Run In Fullscreen Mode?", "Start FullScreen?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 	{
@@ -640,10 +659,8 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 		return 0;									// Quit If Window Was Not Created
 	}
 
-	player.SetObjects(3, 2);						// Set Player 
-
+	player.SetObjects(20, 20);
 	Timer = Timer.TimerInit();
-	Map.Loading_Map(map_DB[0]);
 
 	PlaySound("BGM/yeondu.wav", NULL, SND_ASYNC | SND_LOOP);
 	count = 0;
@@ -691,92 +708,112 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 				}
 			}
 
-			if (keys['A'] && !ap)					// If 'A' Key Is Pressed And Not Held
-			{
-				ap = true;							// ap Becomes TRUE
-				anti = !anti;						// Toggle Antialiasing
-			}
-			if (!keys['A'])							// If 'A' Key Has Been Released
-			{
-				ap = FALSE;							// ap Becomes FALSE
-			}
-
 			if (active)								// If Programs Active Move Objects
 			{
-				if (keys[VK_RIGHT])
+				if (interrupt)
 				{
-					if (!player.Check_Direct(3)) {}
-					else if ((count >= LENGTH) && player.Check_Stop() && (player.x < VERTICLE_LINE) && (Map.Check_Map(player.x + 1, player.y) != 0))
+					if (intro)
 					{
-						player.x++;
-						count = 0;
-						if (Map.Check_Map(player.x, player.y) == 2)
-						{
-							player.tile = 1;
+						if (wait) {
+							count = 0;
+							wait = false;
 						}
-						else { player.tile = 0; }
-					}
-					else if (count >= LENGTH) { count = 0; }
-				}
-				if (keys[VK_LEFT])
-				{
-					if (!player.Check_Direct(1)) {}
-					else if ((count >= LENGTH) && player.Check_Stop() && (player.x > 0) && (Map.Check_Map(player.x - 1, player.y) != 0))
-					{
-						player.x--;
-						count = 0;
-						if (Map.Check_Map(player.x, player.y) == 2)
+						Map.map_number = 3 + animation % 6;
+						if (count > LENGTH && keys['Z'])
 						{
-							player.tile = 1;
-						}
-						else { player.tile = 0; }
-					}
-					else if (count >= LENGTH) { count = 0; }
-				}
-				if (keys[VK_DOWN])
-				{
-					if (!player.Check_Direct(0)) {}
-					else if ((count >= LENGTH) && player.Check_Stop() && (player.y < HORIZONTAL_LINE) && (Map.Check_Map(player.x, player.y + 1) != 0))
-					{
-						player.y++;
-						count = 0;
-						if (Map.Check_Map(player.x, player.y) == 2)
-						{
-							player.tile = 1;
-						}
-						else { player.tile = 0; }
-					}
-					else if (count >= LENGTH) { count = 0; }
-				}
-				if (keys[VK_UP])
-				{
-					if (!player.Check_Direct(2)) {}
-					else if ((count >= LENGTH) && player.Check_Stop() && (player.y > 0) && (Map.Check_Map(player.x, player.y - 1) != 0))
-					{
-						player.y--;
-						count = 0;
-						if (Map.Check_Map(player.x, player.y) == 2)
-						{
-							player.tile = 1;
-						}
-						else { player.tile = 0; }
-					}
-					else if (count >= LENGTH) { count = 0; }
-				}
+							interrupt = false;
+							intro = false;
 
-				if (count < LENGTH)
-				{
-					player.WalkAnimation(count);
-					count += steps[adjust];
+							// 게임 셋팅
+							Map.Loading_Map(map_DB[0]);
+							player.SetObjects(3, 2);
+							Map.map_number = 0;
+							animation = 0;
+							count = 0;
+						}
+						if (count % 40 == 0)
+						{
+							animation++;
+						}
+						count++;
+					}
 				}
-				// Move player from (fx, fy) to (x, y)
-				player.MoveObject(steps[adjust]);
+				else {
+					if (keys[VK_RIGHT])
+					{
+						if (!player.Check_Direct(3)) {}
+						else if ((count >= LENGTH) && player.Check_Stop() && (player.x < VERTICLE_LINE) && (Map.Check_Map(player.x + 1, player.y) != 0))
+						{
+							player.x++;
+							count = 0;
+							if (Map.Check_Map(player.x, player.y) == 2)
+							{
+								player.tile = 1;
+							}
+							else { player.tile = 0; }
+						}
+						else if (count >= LENGTH) { count = 0; }
+					}
+					if (keys[VK_LEFT])
+					{
+						if (!player.Check_Direct(1)) {}
+						else if ((count >= LENGTH) && player.Check_Stop() && (player.x > 0) && (Map.Check_Map(player.x - 1, player.y) != 0))
+						{
+							player.x--;
+							count = 0;
+							if (Map.Check_Map(player.x, player.y) == 2)
+							{
+								player.tile = 1;
+							}
+							else { player.tile = 0; }
+						}
+						else if (count >= LENGTH) { count = 0; }
+					}
+					if (keys[VK_DOWN])
+					{
+						if (!player.Check_Direct(0)) {}
+						else if ((count >= LENGTH) && player.Check_Stop() && (player.y < HORIZONTAL_LINE) && (Map.Check_Map(player.x, player.y + 1) != 0))
+						{
+							player.y++;
+							count = 0;
+							if (Map.Check_Map(player.x, player.y) == 2)
+							{
+								player.tile = 1;
+							}
+							else { player.tile = 0; }
+						}
+						else if (count >= LENGTH) { count = 0; }
+					}
+					if (keys[VK_UP])
+					{
+						if (!player.Check_Direct(2)) {}
+						else if ((count >= LENGTH) && player.Check_Stop() && (player.y > 0) && (Map.Check_Map(player.x, player.y - 1) != 0))
+						{
+							player.y--;
+							count = 0;
+							if (Map.Check_Map(player.x, player.y) == 2)
+							{
+								player.tile = 1;
+							}
+							else { player.tile = 0; }
+						}
+						else if (count >= LENGTH) { count = 0; }
+					}
 
-				if (Map.Check_Map(player.x, player.y) == 3)
-				{
-					Map.Link_Map(&(player.x), &(player.y));
-					Map.Loading_Map(map_DB[Map.map_number]);
-					player.SetObjects(player.x, player.y);
+					if (count < LENGTH)
+					{
+						player.WalkAnimation(count);
+						count += steps[adjust];
+					}
+					// Move player from (fx, fy) to (x, y)
+					player.MoveObject(steps[adjust]);
+
+					if (Map.Check_Map(player.x, player.y) == 3)
+					{
+						Map.Link_Map(&(player.x), &(player.y));
+						Map.Loading_Map(map_DB[Map.map_number]);
+						player.SetObjects(player.x, player.y);
+					}
 				}
 			}
 		}
