@@ -711,7 +711,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 	Timer = Timer.TimerInit();
 
 	BGM[0] = LoadMP3(hWnd, "BGM/GoldenCity.mp3");
-	BGM[0] = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+	BGM[0] = mciSendCommand(1, MCI_PLAY, MCI_NOTIFY|MCI_DGV_PLAY_REPEAT, (DWORD)(LPVOID)&mciPlay);
 
 	count = 0;
 
