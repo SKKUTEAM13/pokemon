@@ -26,8 +26,6 @@
 #define NUM_MAP_IMAGE 9
 #define NUM_WINDOW_IMAGE 4
 
-
-
 HDC			hDC = NULL;		// Private GDI Device Context
 HGLRC		hRC = NULL;		// Permanent Rendering Context
 HWND		hWnd = NULL;	// Holds Our Window Handle
