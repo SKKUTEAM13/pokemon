@@ -46,7 +46,7 @@ MCI_OPEN_PARMS      mciOpen; //음악 파일을 로드
 MCI_PLAY_PARMS       mciPlay; //음악 파일을 재생
 MCI_STATUS_PARMS   mciStatus; //음악 파일의 상태
 
-DWORD BGM[20];
+DWORD BGM[NUM_BGM + 2];
 UINT wDeviceID = 0;
 int nowplaying = 0;
 
@@ -94,6 +94,14 @@ char path_map[NUM_MAP_IMAGE][63] =
 { "image/map/senter.bmp" },
 { "image/map/home.bmp" },
 { "image/map/forrest.bmp" }  };
+int BGM_map[NUM_MAP_IMAGE] = { 1, 2, 3, 1 };
+// BGM //
+char path_BGM[NUM_BGM][100] =
+{ { "BGM/title-screen.mp3" },
+{ "BGM/welcome-to-the-world-of-pokemon.mp3" },
+{ "BGM/pokemon-center.mp3" },
+{ "BGM/pokemon-lab.mp3" },
+{ "BGM/routes.mp3" } };
 // 인트로 //
 char path_intro[NUM_INTRO_IMAGE][63] =
 { { "image/intro/intro1.bmp" },
@@ -108,13 +116,6 @@ char path_window[NUM_WINDOW_IMAGE][63] =
 { "image/window/talk.bmp" },
 { "image/window/yesno.bmp" },
 { "image/window/battle.bmp" } };
-// BGM //
-char path_BGM[NUM_BGM][100] =
-{ { "BGM/title-screen.mp3" },
-{ "BGM/welcome-to-the-world-of-pokemon.mp3" },
-{ "BGM/pokemon-center.mp3" },
-{ "BGM/pokemon-lab.mp3" },
-{ "BGM/routes.mp3"} };
 ////////////////////// 맵 데이터 ////////////////
 int list_DB[1][165] =
 { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
@@ -1045,17 +1046,17 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						Map.Link_Map(&(player.x), &(player.y));
 						Map.Loading_Map(map_DB[Map.map_number]);
 						player.SetObjects(player.x, player.y);
-
-						mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
-						mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
-						nowplaying = Map.map_number + 2;
-						mciSendCommand(Map.map_number + 2, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+						if (nowplaying != BGM_map[Map.map_number] + 1)
+						{
+							mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+							mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
+							nowplaying = BGM_map[Map.map_number] + 1;
+							mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+						}
 						count = 0;
 					}
 					count += steps[adjust];
 				}
-				if (count > 4000)
-					count = 0;
 			}
 		}
 	}

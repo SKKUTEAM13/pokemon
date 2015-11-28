@@ -1,0 +1,5 @@
+ID	이름	BGM
+0 	스타트 	title-screen
+1	센터	welcome-to-the-world-of-pokemon
+2	집	pokemon-lab
+3	동굴길	1 동일

@@ -1,0 +1,20 @@
+-NPC
+이미지 파일 재사용이면 마지막 두줄
+이미지 파일 image에 넣기
+#define NUM_NPC_IMAGE 숫자 추가
+char path_npc 제일 끝에 npc이미지 경로 추가
+char map_DB에서 원하는 위치에 NPC 추가
+이미지 번호/보는 방향/5 (보는 방향은 왼쪽부터 시계방향으로 0~3)
+예 535 : 아래방향보는 간호순
+-맵
+#define NUM_MAP_IMAGE 숫자 추가
+char path_map 제일 끝에 맵이미지 경로 추가
+char map_DB에 165(15x11)추가
+int  BGM_map에 원하는 BGM(ID는 0~)골라서 숫자 넣기
+-워프
+맵번호/x좌표/y좌표/3
+예) 101013 : 1번 맵에 (1,1)에 주인공 생성
+주의! 워프 좌표 위로 주인공을 보내면 안됨
+-BGM
+#define NUM_BGM 숫자 추가
+char path_BGM 제일 끝에 BGM 추가 
