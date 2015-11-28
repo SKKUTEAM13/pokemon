@@ -23,7 +23,7 @@
 #define START_X 30			// Start Map point Left Top
 #define START_Y 60
 #define NUM_CHARACTER_IMAGE 12
-#define NUM_MAP_IMAGE 4
+#define NUM_MAP_IMAGE 5
 #define NUM_WINDOW_IMAGE 4
 #define NUM_INTRO_IMAGE 6
 #define NUM_BGM 5
@@ -93,15 +93,16 @@ char path_map[NUM_MAP_IMAGE][63] =
 { { "image/map/icon.bmp" },
 { "image/map/senter.bmp" },
 { "image/map/home.bmp" },
-{ "image/map/forrest.bmp" }  };
-int BGM_map[NUM_MAP_IMAGE] = { 1, 2, 3, 1 };
+{ "image/map/forrest.bmp" },
+{ "image/map/icecave.bmp"} };
+int BGM_map[NUM_MAP_IMAGE] = { 1, 2, 3, 1, 4 };
 // BGM //
 char path_BGM[NUM_BGM][100] =
 { { "BGM/title-screen.mp3" },
 { "BGM/welcome-to-the-world-of-pokemon.mp3" },
 { "BGM/pokemon-center.mp3" },
 { "BGM/pokemon-lab.mp3" },
-{ "BGM/routes.mp3" } };
+{ "BGM/cave.mp3" } };
 // 인트로 //
 char path_intro[NUM_INTRO_IMAGE][63] =
 { { "image/intro/intro1.bmp" },
@@ -166,7 +167,7 @@ int map_DB[NUM_MAP_IMAGE][165] =
 1, 1, 1, 0, 0, 3023, 3023, 0, 0, 0, 0, 0, 0, 1, 1 },
 { 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1,
-1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1,
+1, 0, 1, 0, 1, 0, 0, 0, 401093, 0, 1, 1, 1, 1, 1,
 0, 1, 44, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1,
 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1,
 13053, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
@@ -174,7 +175,18 @@ int map_DB[NUM_MAP_IMAGE][165] =
 13073, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 13083, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 13093, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } ,
+{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 0, 0,
+0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 0,
+0, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 0,
+0, 4, 0, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 0,
+0, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0, 1, 0,
+0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
+0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0,
+0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+0, 308033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 ////////////////////////////
 /* Texture */
 GLuint	texture_char[NUM_CHARACTER_IMAGE];			// 캐릭터 이미지 저장
@@ -870,7 +882,12 @@ void people::MovementByKeyInput(int VK_INPUT)
 			{
 				if (Map.map_array[x][y] / 10 == 0)
 				{	// 얼음 끝나기 전까지 미끄러짐
-					while (Map.Check_Map(x, y) == 4)
+					while (Map.Check_Map(x + X_DirectKey, y + Y_DirectKey) == 4)
+					{
+						x += X_DirectKey;
+						y += Y_DirectKey;
+					}
+					if (Map.Check_Map(x + X_DirectKey, y + Y_DirectKey) == 1)
 					{
 						x += X_DirectKey;
 						y += Y_DirectKey;
