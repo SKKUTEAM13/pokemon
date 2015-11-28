@@ -19,8 +19,9 @@
 
 #define START_X 30			// Start Map point Left Top
 #define START_Y 60
-#define NUM_CHARACTER_IMAGE 6
+#define NUM_CHARACTER_IMAGE 5
 #define NUM_MAP_IMAGE 9
+#define NUM_WINDOW_IMAGE 4
 
 HDC			hDC = NULL;		// Private GDI Device Context
 HGLRC		hRC = NULL;		// Permanent Rendering Context
@@ -65,15 +66,15 @@ DWORD LoadMP3(HWND hWnd, LPCTSTR lpszWave)
 	return 0;
 }
 ////////////////////////////////////////////////
+char path_font[1][63] = { { "image/font/font.bmp" } };
 char path_char[NUM_CHARACTER_IMAGE][63] =
 { { "image/object/Gi_U0.bmp" },				// 지우 LEFT
 { "image/object/Gi_U1.bmp" },				// 지우 UP
 { "image/object/Gi_U2.bmp" },				// 지우 RIGHT
 { "image/object/Gi_U3.bmp" },				// 지우 DOWN
-{ "image/object/object_grass.bmp" },		// 캐릭터 풀 애니메이션
-{ "image/object/Ganhosun.bmp" } };
+{ "image/object/object_grass.bmp" } };		// 캐릭터 풀 애니메이션 
 
-char path_map[NUM_MAP_IMAGE][31] =
+char path_map[NUM_MAP_IMAGE][63] =
 { { "image/map/icon.bmp" },
 { "image/map/senter.bmp" },
 { "image/map/home.bmp" },
@@ -83,6 +84,12 @@ char path_map[NUM_MAP_IMAGE][31] =
 { "image/intro/intro4.bmp" },
 { "image/intro/intro5.bmp" },
 { "image/intro/intro6.bmp" } };
+
+char path_window[NUM_WINDOW_IMAGE][63] =
+{ { "image/window/menu.bmp" },
+{ "image/window/talk.bmp" },
+{ "image/window/yesno.bmp" },
+{ "image/window/battle.bmp" } };
 
 int list_DB[1][165] =
 { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
@@ -139,6 +146,7 @@ int map_DB[NUM_MAP_IMAGE][165] =
 /* Texture */
 GLuint	texture_char[NUM_CHARACTER_IMAGE];			// 캐릭터 이미지 저장
 GLuint	texture_map[NUM_MAP_IMAGE];					// 맵 이미지 저장
+GLuint	texture_window[NUM_WINDOW_IMAGE];
 GLuint	texture_font[1];
 GLuint	base;
 
@@ -162,57 +170,39 @@ object	arrow;
 
 LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
 
-void RegisterTextures(GLuint *texture, int i, const char *path)
+bool RegisterTextures(GLuint *texture, int NUM_IMAGE, char (*path)[63])
 {
-	texture[i] = SOIL_load_OGL_texture
-		(
-			path,
-			SOIL_LOAD_AUTO,
-			SOIL_CREATE_NEW_ID,
-			SOIL_FLAG_INVERT_Y
-			);
+	for (loop1 = 0; loop1 < NUM_IMAGE; loop1++)
+	{
+		texture[loop1] = SOIL_load_OGL_texture
+			(
+				path[loop1],
+				SOIL_LOAD_AUTO,
+				SOIL_CREATE_NEW_ID,
+				SOIL_FLAG_INVERT_Y
+				);
+		if (texture[loop1] == 0)
+			return false;
+		glBindTexture(GL_TEXTURE_2D, texture[loop1]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 }
 
 int LoadGLTextures()										// Load Bitmaps And Convert To Textures
 {
+	bool check = true;
 	// 폰트
-	RegisterTextures(texture_font, 0, "image/font/font.bmp");
-	if (texture_font[0] == 0)
-		return false;
-
-	glBindTexture(GL_TEXTURE_2D, texture_font[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	check = check & RegisterTextures(texture_font, 1, path_font);
 
 	// 캐릭터
-	for (loop1 = 0; loop1 < NUM_CHARACTER_IMAGE; loop1++)
-	{
-		RegisterTextures(texture_char, loop1, path_char[loop1]);
-		if (texture_char[loop1] == 0)
-			return false;
-	}
-
-	for (loop1 = 0; loop1 < NUM_CHARACTER_IMAGE; loop1++)
-	{
-		glBindTexture(GL_TEXTURE_2D, texture_char[loop1]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
+	check = check & RegisterTextures(texture_char, NUM_CHARACTER_IMAGE, path_char);
 
 	// map
-	for (loop1 = 0; loop1 < NUM_MAP_IMAGE; loop1++)
-	{
-		RegisterTextures(texture_map, loop1, path_map[loop1]);
-		if (texture_map[loop1] == 0)
-			return false;
-	}
+	check = check & RegisterTextures(texture_map, NUM_MAP_IMAGE, path_map);
 
-	for (loop1 = 0; loop1 < NUM_CHARACTER_IMAGE; loop1++)
-	{
-		glBindTexture(GL_TEXTURE_2D, texture_map[loop1]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
+	// window
+	check = check & RegisterTextures(texture_window, NUM_WINDOW_IMAGE, path_window);
 
 	return true;
 }
@@ -388,57 +378,65 @@ int DrawGLScene(GLvoid)
 	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 
-	//if (keys['X']) {
-	//	isMenuOn = !isMenuOn;
-	//	if (isMenuOn == 0)
-	//		active = 1;
-	//	Timer.SleepTime(steps[adjust], 3 * 80);
-	//}
 	if (isMenuOn)
 	{
 		interrupt = true;
-		glLoadIdentity();																													
-		glTranslatef(7 * LENGTH + START_X * 1.0f, 9.5 * LENGTH + START_Y * 1.0f, 0.0f);
-		
+		glLoadIdentity();
+		glEnable(GL_TEXTURE_2D);
+		glTranslatef(7 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[1]);
 		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
-		glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
-		glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
-		glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
 		glEnd();
 
 		glLoadIdentity();
-		glTranslatef(13 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
-
+		glTranslatef(12.5 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[0]);
 		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glVertex2d(-LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glVertex2d( LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glVertex2d( LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glVertex2d(-LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d( LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d( LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
 		glEnd();
+	
+
+		glLoadIdentity();
+		glTranslatef(11.5 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[3]);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 6 / 2, LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 6 / 2, LENGTH * 3 / 2);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
 
 		glLoadIdentity();
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_DST_COLOR, GL_ZERO);
 		glBindTexture(GL_TEXTURE_2D, texture_font[0]);
-
 		glColor3f(1.0f, 1.0f, 1.0f);
-
-		glPrint(START_X + arrow.x * LENGTH, START_Y + arrow.y * LENGTH, 1, "/");
-		glPrint(12 * LENGTH + START_X * 1.0f,
-			0 * LENGTH + START_Y * 1.0f, 0,
+		// 화살표
+		glPrint(START_X + arrow.x * LENGTH,
+			START_Y + (arrow.y + 0.5)* LENGTH, 1,
+			"/");
+		// 메뉴
+		glPrint(11.5 * LENGTH + START_X * 1.0f,
+			0.5 * LENGTH + START_Y * 1.0f, 0,
 			"Player");
-		glPrint(12 * LENGTH + START_X * 1.0f,
-			1 * LENGTH + START_Y * 1.0f, 0,
+		glPrint(11.5 * LENGTH + START_X * 1.0f,
+			1.5 * LENGTH + START_Y * 1.0f, 0,
 			"Exit");
-		/*glPrint(9 * LENGTH + START_X * 1.0f,
-			8.4 * LENGTH + START_Y * 1.0f, 0,
-			"FIGHT  $");
-		glPrint(9 * LENGTH + START_X * 1.0f,
-			9.3 * LENGTH + START_Y * 1.0f, 0,
-			"PACK   RUN");*/
+		// 배틀
+		glPrint(9.5 * LENGTH + START_X * 1.0f,
+			8.5 * LENGTH + START_Y * 1.0f, 1,
+			"FIGHT  $&");
+		glPrint(9.5 * LENGTH + START_X * 1.0f,
+			9.5 * LENGTH + START_Y * 1.0f, 0,
+			"PACK   RUN");
 		glDisable(GL_BLEND);
 	}
 	return true;
@@ -877,7 +875,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 					// 멈춰있을때 메뉴 부름
 					if (keys['X'] && !player.WalkAnimation(count)) {
 						isMenuOn = !isMenuOn;
-						arrow.SetObjects(11, 0);
+						arrow.SetObjects(9, 8);
 						Map.Loading_Map(list_DB[0]);
 						Timer.SleepTime(steps[adjust], 200);
 					}
