@@ -407,7 +407,9 @@ int DrawGLScene(GLvoid)
 		}
 		else if (count > 2 * LENGTH)
 		{
-			player.tile = 0;
+			if (Map.Check_Map(player.x, player.y) == 2)
+				player.tile = 1;
+			else player.tile = 0;
 		}
 		glLoadIdentity();
 		glTranslatef(player.fx + START_X * 1.0f, animation + player.fy + START_Y * 1.0f, 0.0f);
@@ -841,7 +843,7 @@ void people::MovementByKeyInput(int VK_INPUT)
 		int X_DirectKey = (DirectKey - 1) % 2;
 		int Y_DirectKey = (DirectKey - 2) % 2;
 
-		if ((count >= LENGTH) && !Check_Direct(DirectKey)) { return; }
+		if (!Check_Direct(DirectKey)) { return; }
 		else if (													
 			(y + Y_DirectKey <= HORIZONTAL_LINE) &&						// 이동 후 좌표 맵범위 안쪽인 x가 0~14, y가 0~10인지 확인 
 			(x + X_DirectKey <= VERTICLE_LINE) &&
@@ -947,7 +949,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 				SwapBuffers(hDC);					// Swap Buffers (Double Buffering)
 			}
 
-			while (Timer.TimerGetTime() < start + float(steps[adjust] * 6.0f)) {}	// Waste Cycles On Fast Systems
+			while (Timer.TimerGetTime() < start + float(steps[adjust] * 4.0f)) {}	// Waste Cycles On Fast Systems
 
 			if (keys[VK_F1])						// Is F1 Being Pressed?
 			{
@@ -1007,6 +1009,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							Map.Loading_Map(map_DB[Map.map_number]);
 							Timer.SleepTime(steps[adjust], 200);
 							count = 0;
+							player.SetObjects(player.x, player.y);
 						}
 						else
 						{
@@ -1021,7 +1024,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 				}
 				else {
 					// 멈춰있을때 메뉴 부름
-					if (keys['X'] && !player.WalkAnimation(count)) {
+					if (keys['X'] && !player.WalkAnimation(count )) {
 						isMenuOn = !isMenuOn;
 						arrow.SetObjects(9, 8);
 						Map.Loading_Map(list_DB[0]);
@@ -1032,13 +1035,6 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 					player.MovementByKeyInput(VK_UP);
 					player.MovementByKeyInput(VK_RIGHT);
 					player.MovementByKeyInput(VK_DOWN);
-
-					if (count < LENGTH)
-					{
-						player.WalkAnimation(count);
-					}
-					// Move player from (fx, fy) to (x, y)
-					player.MoveObject(steps[adjust], count);
 
 					if (Map.Check_Map(player.x, player.y) == 3)
 					{
@@ -1055,7 +1051,16 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						}
 						count = 0;
 					}
-					count += steps[adjust];
+					else
+					{
+						if (count < LENGTH)
+						{
+							player.WalkAnimation(count);
+						}
+						// Move player from (fx, fy) to (x, y)
+						player.MoveObject(steps[adjust], count);
+						count += steps[adjust];
+					}
 				}
 			}
 		}
