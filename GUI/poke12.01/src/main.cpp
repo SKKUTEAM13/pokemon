@@ -142,8 +142,8 @@ int list_DB[1][165] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 1, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 1, 0, 0,
@@ -218,7 +218,7 @@ Story talk_poke[8] =
 { {1, 1, 0, "Pika?"},
 {0, 0, 0, "Pikachu!"},
 {3, 3, 1, "Welcom to CENTER!"},
-{4, 5, 1, "back to perfect!"},
+{4, 5, 2, "back to perfect!"},
 {5, 6, 1, "health."},
 // 5 //
 {2, 2, 0, "see you again"},
@@ -241,10 +241,12 @@ int		animation = 0;								// people 클래스가 아닌 아닌 것들 애니매이션 용
 int		isMenuOn = 0;								// 메뉴의 켜고 끔을 위해서 필요!
 int		TalkNPC = -1;
 int 	wait = 0;
+int		Answer = -1;
+int		X_Answer, Y_Answer;
 
 bool	intro = true;
 bool	Talk = false;
-
+bool	YesNo = false;
 bool	interrupt = true;									// 외부 입력이 들어오거나 z키를 눌렀을때 반응하면 true
 bool	IsJump = false;
 
@@ -468,7 +470,7 @@ int DrawGLScene(GLvoid)
 		glLoadIdentity();
 		glTranslatef(player.fx + START_X * 1.0f, animation + player.fy + START_Y * 1.0f, 0.0f);
 		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-		glBindTexture(GL_TEXTURE_2D, texture_char[11]);
+		glBindTexture(GL_TEXTURE_2D, texture_char[14]);
 		glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0.0f, 0.99f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);
@@ -524,17 +526,16 @@ int DrawGLScene(GLvoid)
 
 	if (isMenuOn)
 	{
-		interrupt = true;
-		glLoadIdentity();
-		glEnable(GL_TEXTURE_2D);
-		glTranslatef(7 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
-		glBindTexture(GL_TEXTURE_2D, texture_window[1]);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
-		glEnd();
+		//glLoadIdentity();
+		//glEnable(GL_TEXTURE_2D);
+		//glTranslatef(7 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		//glBindTexture(GL_TEXTURE_2D, texture_window[1]);
+		//glBegin(GL_QUADS);
+		//glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		//glTexCoord2f(1.0f, 1.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		//glTexCoord2f(1.0f, 0.0f); glVertex2d( LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
+		//glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2,  LENGTH * 3 / 2);
+		//glEnd();
 
 		glLoadIdentity();
 		glTranslatef(12.5 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
@@ -546,15 +547,15 @@ int DrawGLScene(GLvoid)
 		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
 		glEnd();
 
-		glLoadIdentity();
-		glTranslatef(11.5 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
-		glBindTexture(GL_TEXTURE_2D, texture_window[3]);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 6 / 2, -LENGTH * 3 / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 6 / 2, -LENGTH * 3 / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 6 / 2, LENGTH * 3 / 2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 6 / 2, LENGTH * 3 / 2);
-		glEnd();
+		//glLoadIdentity();
+		//glTranslatef(11.5 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		//glBindTexture(GL_TEXTURE_2D, texture_window[3]);
+		//glBegin(GL_QUADS);
+		//glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		//glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		//glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 6 / 2, LENGTH * 3 / 2);
+		//glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 6 / 2, LENGTH * 3 / 2);
+		//glEnd();
 		
 		glLoadIdentity();
 		glEnable(GL_BLEND);
@@ -572,19 +573,18 @@ int DrawGLScene(GLvoid)
 		glPrint(11.5 * LENGTH + START_X * 1.0f,
 			1.5 * LENGTH + START_Y * 1.0f, 0,
 			"Exit");
-		// 배틀
-		glPrint(9.5 * LENGTH + START_X * 1.0f,
-			8.5 * LENGTH + START_Y * 1.0f, 1,
-			"FIGHT  $&");
-		glPrint(9.5 * LENGTH + START_X * 1.0f,
-			9.5 * LENGTH + START_Y * 1.0f, 0,
-			"PACK   RUN");
+		//// 배틀
+		//glPrint(9.5 * LENGTH + START_X * 1.0f,
+		//	8.5 * LENGTH + START_Y * 1.0f, 1,
+		//	"FIGHT  $&");
+		//glPrint(9.5 * LENGTH + START_X * 1.0f,
+		//	9.5 * LENGTH + START_Y * 1.0f, 0,
+		//	"PACK   RUN");
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 	}
 	if (Talk)
 	{
-		interrupt = true;
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
 		glTranslatef(7 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
@@ -608,16 +608,39 @@ int DrawGLScene(GLvoid)
 
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
+	}
+	if (YesNo)
+	{
+		glLoadIdentity();
+		glEnable(GL_TEXTURE_2D);
+		glTranslatef(13 * LENGTH + START_X * 1.0f, 6 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[2]);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 3 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 3 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 3 / 2, LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 3 / 2, LENGTH * 3 / 2);
+		glEnd();
 
 		glLoadIdentity();
-		glTranslatef((1.5 + wait / 2.0) * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+		glBindTexture(GL_TEXTURE_2D, texture_font[0]);
 		glColor3f(1.0f, 1.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex2d(-LENGTH * wait / 2.0f, -LENGTH * 2 / 2.0f);
-		glVertex2d(LENGTH * wait / 2.0f, -LENGTH * 2 / 2.0f);
-		glVertex2d(LENGTH * wait / 2.0f, LENGTH * 2 / 2.0f);
-		glVertex2d(-LENGTH * wait / 2.0f, LENGTH * 2 / 2.0f);
-		glEnd();
+		// 화살표
+		glPrint(START_X + arrow.x * LENGTH,
+			START_Y + (arrow.y + 0.5)* LENGTH, 1,
+			"/");
+		// 메뉴
+		glPrint(12.5 * LENGTH + START_X * 1.0f,
+			5.5 * LENGTH + START_Y * 1.0f, 0,
+			"Yes");
+		glPrint(12.5 * LENGTH + START_X * 1.0f,
+			6.5 * LENGTH + START_Y * 1.0f, 0,
+			"No");
+
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
 	}
 	return true;
 }
@@ -899,22 +922,23 @@ void object::MovementByKeyInput(int VK_INPUT)
 	if (keys[VK_INPUT]) 
 	{
 		int DirectKey = VK_INPUT - VK_LEFT;
-		if ((count >= LENGTH) &&													// 애니메이션 한동작이 끝났는가
-				(y + (DirectKey - 2) % 2 <= HORIZONTAL_LINE) &&							// 이동 후 좌표 맵범위 안쪽인 x가 0~14, y가 0~10인지 확인 
-				(x + (DirectKey - 1) % 2 <= VERTICLE_LINE) &&
-				(y + (DirectKey - 2) % 2 >= 0) && 
-				(x + (DirectKey - 1) % 2 >= 0) &&
-				(Map.Check_Map(x + (DirectKey - 1) % 2, y + (DirectKey - 2) % 2) != 0)) // 맵이 충돌 타일인지 아닌지 검사
+		int X_DirectKey = (DirectKey - 1) % 2;
+		int Y_DirectKey = (DirectKey - 2) % 2;
+
+		if ((y + Y_DirectKey <= HORIZONTAL_LINE) &&						// 이동 후 좌표 맵범위 안쪽인 x가 0~14, y가 0~10인지 확인 
+			(x + X_DirectKey <= VERTICLE_LINE) &&
+			(y + Y_DirectKey >= 0) &&
+			(x + X_DirectKey >= 0) &&
+			(Map.Check_Map(x + X_DirectKey, y + Y_DirectKey) != 0)) // 맵이 충돌 타일인지 아닌지 검사
 		{
-			x += (DirectKey - 1) % 2;
-			y += (DirectKey - 2) % 2;
-			count = 0;
+			x += X_DirectKey;
+			y += Y_DirectKey;
 
 			// 4번 타일은 미끄러지는 타일
 			while (Map.Check_Map(x, y) == 4)
 			{
-				x += (DirectKey - 1) % 2;
-				y += (DirectKey - 2) % 2;
+				x += X_DirectKey;
+				y += Y_DirectKey;
 			}
 		}
 	}
@@ -1094,12 +1118,12 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 					if (isMenuOn)
 					{
 						if (keys['X']) {
-							isMenuOn = !isMenuOn;
-							if (isMenuOn == 0)
-								interrupt = false;
-							Map.Loading_Map(map_DB[Map.map_number]);
 							keys['X'] = 0;
+							isMenuOn = false;
+							interrupt = false;
+							Map.Loading_Map(map_DB[Map.map_number]);
 							count = LENGTH;
+							arrow.SetObjects(20, 20);
 							player.SetObjects(player.x, player.y);
 						}
 						else
@@ -1109,7 +1133,35 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							arrow.MovementByKeyInput(VK_RIGHT);
 							arrow.MovementByKeyInput(VK_DOWN);
 							arrow.SetObjects(arrow.x, arrow.y);
-							count += steps[adjust];
+						}
+					}
+					// Yes No
+					if (YesNo)
+					{
+						if (keys['X']) {
+							keys['X'] = 0;
+							YesNo = false;
+							Answer = 1;
+							player.SetObjects(player.x, player.y);
+							Map.Loading_Map(map_DB[Map.map_number]);
+							count = LENGTH;
+						}
+						if (keys['Z']) {
+							keys['Z'] = 0;
+							YesNo = false;
+							Answer = arrow.x - 12 + arrow.y - 5;
+							arrow.SetObjects(20, 20);
+							player.SetObjects(player.x, player.y);
+							Map.Loading_Map(map_DB[Map.map_number]);
+							count = LENGTH;
+						}
+						else
+						{
+							arrow.MovementByKeyInput(VK_LEFT);
+							arrow.MovementByKeyInput(VK_UP);
+							arrow.MovementByKeyInput(VK_RIGHT);
+							arrow.MovementByKeyInput(VK_DOWN);
+							arrow.SetObjects(arrow.x, arrow.y);
 						}
 					}
 					// 대화 interrupt
@@ -1118,8 +1170,32 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						if (wait == 0) {
 							if (keys['Z']) {
 								keys['Z'] = 0;
-								interrupt = Talk = talk_poke[Map.NPC[TalkNPC].story].link;
-								Map.NPC[TalkNPC].story = talk_poke[Map.NPC[TalkNPC].story].YesNext;
+								
+								if (talk_poke[Map.NPC[TalkNPC].story].link > 1) {
+									if (!YesNo && Answer == -1) {
+										YesNo = true;
+										arrow.SetObjects(12, 5);
+										X_Answer = 12;
+										Y_Answer = 5;
+										Map.Loading_Map(list_DB[0]);
+									}
+									else if (Answer != -1) {
+										if (Answer == 0) {
+											interrupt = Talk = true;
+											Map.NPC[TalkNPC].story = talk_poke[Map.NPC[TalkNPC].story].YesNext;
+											Answer = -1;
+										}
+										else if (Answer == 1) {
+											interrupt = Talk = talk_poke[Map.NPC[TalkNPC].story].link;
+											Map.NPC[TalkNPC].story = talk_poke[Map.NPC[TalkNPC].story].NoNext;
+											Answer = -1;
+										}
+									}
+								}
+								else {
+									interrupt = Talk = talk_poke[Map.NPC[TalkNPC].story].link;
+									Map.NPC[TalkNPC].story = talk_poke[Map.NPC[TalkNPC].story].YesNext;
+								}
 							}
 						}
 						else if ((count % LENGTH == 0) && (wait > 0))
@@ -1130,17 +1206,20 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							count += steps[adjust];
 						}
 					}
+
 				}
 				else {
 					// 멈춰있을때 메뉴 부름
 					if (keys['X'] && !player.WalkAnimation(count)) {
 						isMenuOn = !isMenuOn;
-						arrow.SetObjects(9, 8);
+						interrupt = true;
+						arrow.SetObjects(11, 0);
 						Map.Loading_Map(list_DB[0]);
 						keys['X'] = 0;
 					}
+					
 					// npc 말걸기
-					if (keys['Z'] && !player.WalkAnimation(count)) {
+					else if (keys['Z'] && !player.WalkAnimation(count)) {
 						// z 눌렀을때 앞이 NPC 인지 확인
 						if (Map.Check_Map(player.x + (player.direct - 1) % 2, player.y + (player.direct - 2) % 2) == 5) {
 							// 맞다면 누군지 탐색
@@ -1153,6 +1232,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								}
 							}
 							if (TalkNPC != -1) {
+								interrupt = true;
 								Talk = true;
 								keys['Z'] = 0;
 								wait = 8;
@@ -1161,34 +1241,36 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						}
 						else TalkNPC = -1;
 					}
-					//방향키 입력 받으면 움직임
-					player.MovementByKeyInput(VK_LEFT);
-					player.MovementByKeyInput(VK_UP);
-					player.MovementByKeyInput(VK_RIGHT);
-					player.MovementByKeyInput(VK_DOWN);
+					else {
+						//방향키 입력 받으면 움직임
+						player.MovementByKeyInput(VK_LEFT);
+						player.MovementByKeyInput(VK_UP);
+						player.MovementByKeyInput(VK_RIGHT);
+						player.MovementByKeyInput(VK_DOWN);
 
-					if (Map.Check_Map(player.x, player.y) == 3)
-					{
-						Map.DeleteNPC();
-						Map.Link_Map(&(player.x), &(player.y));
-						Map.Loading_Map(map_DB[Map.map_number]);
-						player.SetObjects(player.x, player.y);
-						if (nowplaying != BGM_map[Map.map_number] + 1)
+						if (Map.Check_Map(player.x, player.y) == 3)
 						{
-							mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
-							mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
-							nowplaying = BGM_map[Map.map_number] + 1;
-							mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+							Map.DeleteNPC();
+							Map.Link_Map(&(player.x), &(player.y));
+							Map.Loading_Map(map_DB[Map.map_number]);
+							player.SetObjects(player.x, player.y);
+							if (nowplaying != BGM_map[Map.map_number] + 1)
+							{
+								mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
+								nowplaying = BGM_map[Map.map_number] + 1;
+								mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+							}
+							count = 0;
 						}
-						count = 0;
-					}
-					else
-					{	
-						player.WalkAnimation(count);
-						
-						// Move player from (fx, fy) to (x, y)
-						player.MoveObject(steps[adjust], count);
-						count += steps[adjust];
+						else
+						{
+							player.WalkAnimation(count);
+
+							// Move player from (fx, fy) to (x, y)
+							player.MoveObject(steps[adjust], count);
+							count += steps[adjust];
+						}
 					}
 				}
 			}
