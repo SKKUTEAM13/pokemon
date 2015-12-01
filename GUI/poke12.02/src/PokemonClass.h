@@ -21,6 +21,7 @@ public:
 	void levelUp(int overExp);						// 초과한 경험치
 	int damageCalc(int skill, int opDefense);		// 나의 방어력과 속성등을 고려하여 상대방 공격의 데미지 계산
 	void Damaged(int damage);
+	void Heal();
 	int getAttack();
 	int getVital();
 	int getDefense();

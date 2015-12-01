@@ -39,6 +39,9 @@ void Pokemon::Damaged(int damage) {
 	if (vital < 0)
 		vital = 0;
 }
+void Pokemon::Heal() {
+	vital = fullVital;
+}
 int Pokemon::getAttack() { return attack; }
 int Pokemon::getVital() { return vital; }
 int Pokemon::getDefense() { return defense; }

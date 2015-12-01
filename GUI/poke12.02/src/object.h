@@ -1,9 +1,5 @@
 #pragma once
 
-#include <map>
-#include <set>
-#include <string>
-
 #define LENGTH 40
 
 class object
