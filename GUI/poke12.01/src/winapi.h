@@ -359,9 +359,9 @@ bool CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 }
 
 LRESULT CALLBACK WndProc(HWND	hWnd,				// Handle For This Window
-	UINT	uMsg,				// Message For This Window
-	WPARAM	wParam,				// Additional Message Information
-	LPARAM	lParam)				// Additional Message Information
+					 	 UINT	uMsg,				// Message For This Window
+						 WPARAM	wParam,				// Additional Message Information
+						 LPARAM	lParam)				// Additional Message Information
 {
 	switch (uMsg)									// Check For Windows Messages
 	{

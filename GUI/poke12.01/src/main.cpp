@@ -1,8 +1,9 @@
 /*
-*	Version 11.28
+*	Version 12.01
+*	대화 업뎃, YesNo 업뎃
+*	Version 11.29 
 *	NPC 추가(방향, 텍스트 지정 가능 추후 스토리 추가)
-*	색깔 추가
-*	-27 이전 
+*	색깔 추가 
 *	메뉴
 *	Animation and MAP
 *	OpenGL, MAP, BMP
@@ -26,7 +27,6 @@ int		loop2;				// Generic Loop2
 #include "map.h"
 #include "object.h"
 #include "timer.h"
-
 
 //////////////////// 음악 재생 함수/////////////////
 MCI_OPEN_PARMS      mciOpen; //음악 파일을 로드
@@ -74,6 +74,7 @@ bool	Talk = false;
 bool	YesNo = false;
 bool	interrupt = true;									// 외부 입력이 들어오거나 z키를 눌렀을때 반응하면 true
 bool	IsJump = false;
+bool	battle = false;
 
 /* Unit In Game */
 people	player;										// 플레이어 선언
@@ -113,142 +114,144 @@ int DrawGLScene(GLvoid)
 	// map
 	glLoadIdentity();
 	glEnable(GL_TEXTURE_2D);
-	if (intro)
-	{
-		glTranslatef(7 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
-
-		glBindTexture(GL_TEXTURE_2D, texture_intro[Map.map_number]);
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glEnd();
-	}
-	else {
-		glTranslatef(7 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
-
-		glBindTexture(GL_TEXTURE_2D, texture_map[Map.map_number]);
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glEnd();
-	}
-	glEnable(GL_BLEND);
-
-	for (loop1 = 0; loop1 < Map.num_npc; loop1++)
-	{
-		glPrintPeople(Map.NPC[loop1]);
-	}
-	if (player.tile == 2){
-		if (count % 2 == 0) {}
-		else if (count < LENGTH)
+	if (!battle) {
+		if (intro)
 		{
-			animation += steps[adjust];
+			glTranslatef(7 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
+
+			glBindTexture(GL_TEXTURE_2D, texture_intro[Map.map_number]);
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glEnd();
 		}
-		else if (count < 2 * LENGTH)
-		{
-			animation -= steps[adjust];
+		else {
+			glTranslatef(7 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
+
+			glBindTexture(GL_TEXTURE_2D, texture_map[Map.map_number]);
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glEnd();
 		}
-		else if (count > 2 * LENGTH)
-		{
-			if (Map.Check_Map(player.x, player.y) == 2)
-				player.tile = 1;
-			else player.tile = 0;
-			animation = 0;
-		}
-		glLoadIdentity();
-		glTranslatef(player.fx + START_X * 1.0f, animation + player.fy + START_Y * 1.0f, 0.0f);
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-		glBindTexture(GL_TEXTURE_2D, texture_char[14]);
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glTexCoord2f(0.0f, 0.99f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);
-		glTexCoord2f(1.0f, 0.99f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);
-		glTexCoord2f(1.0f, 0.50f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);
-		glTexCoord2f(0.0f, 0.50f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);
-		glEnd();
-		glBlendFunc(GL_ONE, GL_ONE);
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glTexCoord2f(0.0f, 0.49f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);
-		glTexCoord2f(1.0f, 0.49f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(LENGTH / 2.0, LENGTH / 2.0);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);
-		glEnd();
-	}
-	glPrintPeople(player);
-
-	if (player.tile == 1)
-	{
-		glLoadIdentity();
-		glTranslatef(player.fx + START_X * 1.0f, player.fy - 0.25 * LENGTH + START_Y * 1.0f, 0.0f);	// Move To The Fine Player Position
-
-		int grass = 2;
-		if (!player.Check_Stop())
-		{
-			grass = (count - count / (LENGTH / 2)) / (LENGTH / 2);
-		}
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-		glBindTexture(GL_TEXTURE_2D, texture_char[4]);
-
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glTexCoord2f((grass + 0) / 3.0f, 0.99f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);		// Top Left Of Player
-		glTexCoord2f((grass + 1) / 3.0f, 0.99f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);		// Top Right Of Player
-		glTexCoord2f((grass + 1) / 3.0f, 0.50f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);		// Bottom Right Of Player
-		glTexCoord2f((grass + 0) / 3.0f, 0.50f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);		// Bottom Left Of Player
-		glEnd();
-
-		glBlendFunc(GL_ONE, GL_ONE);
-
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glTexCoord2f((grass + 0) / 3.0f, 0.49f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);		// Top Left Of Player
-		glTexCoord2f((grass + 1) / 3.0f, 0.49f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);		// Top Right Of Player
-		glTexCoord2f((grass + 1) / 3.0f, 0.0f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);		// Bottom Right Of Player
-		glTexCoord2f((grass + 0) / 3.0f, 0.0f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);		// Bottom Left Of Player
-		glEnd();
-	}
-
-	glDisable(GL_BLEND);
-	glDisable(GL_TEXTURE_2D);
-
-	if (isMenuOn)
-	{
-		glLoadIdentity();
-		glTranslatef(12.5 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
-		glBindTexture(GL_TEXTURE_2D, texture_window[0]);
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 1.0f); glVertex2d( LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2d( LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 4 / 2,  LENGTH * (HORIZONTAL_LINE + 1) / 2);
-		glEnd();
-
-		glLoadIdentity();
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-		glBindTexture(GL_TEXTURE_2D, texture_font[0]);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		// 화살표
-		glPrint(START_X + arrow.x * LENGTH,
-			START_Y + (arrow.y + 0.5)* LENGTH, 1,
-			"/");
-		// 메뉴
-		glPrint(11.5 * LENGTH + START_X * 1.0f,
-			0.5 * LENGTH + START_Y * 1.0f, 0,
-			"Player");
-		glPrint(11.5 * LENGTH + START_X * 1.0f,
-			1.5 * LENGTH + START_Y * 1.0f, 0,
-			"Exit");
-		
+
+		for (loop1 = 0; loop1 < Map.num_npc; loop1++)
+		{
+			glPrintPeople(Map.NPC[loop1]);
+		}
+		if (player.tile == 2) {
+			if (count % 2 == 0) {}
+			else if (count < LENGTH)
+			{
+				animation += steps[adjust];
+			}
+			else if (count < 2 * LENGTH)
+			{
+				animation -= steps[adjust];
+			}
+			else if (count > 2 * LENGTH)
+			{
+				if (Map.Check_Map(player.x, player.y) == 2)
+					player.tile = 1;
+				else player.tile = 0;
+				animation = 0;
+			}
+			glLoadIdentity();
+			glTranslatef(player.fx + START_X * 1.0f, animation + player.fy + START_Y * 1.0f, 0.0f);
+			glBlendFunc(GL_DST_COLOR, GL_ZERO);
+			glBindTexture(GL_TEXTURE_2D, texture_char[14]);
+			glBegin(GL_QUADS);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glTexCoord2f(0.0f, 0.99f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);
+			glTexCoord2f(1.0f, 0.99f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);
+			glTexCoord2f(1.0f, 0.50f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);
+			glTexCoord2f(0.0f, 0.50f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);
+			glEnd();
+			glBlendFunc(GL_ONE, GL_ONE);
+			glBegin(GL_QUADS);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glTexCoord2f(0.0f, 0.49f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);
+			glTexCoord2f(1.0f, 0.49f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(LENGTH / 2.0, LENGTH / 2.0);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);
+			glEnd();
+		}
+		glPrintPeople(player);
+
+		if (player.tile == 1)
+		{
+			glLoadIdentity();
+			glTranslatef(player.fx + START_X * 1.0f, player.fy - 0.25 * LENGTH + START_Y * 1.0f, 0.0f);	// Move To The Fine Player Position
+
+			int grass = 2;
+			if (!player.Check_Stop())
+			{
+				grass = (count - count / (LENGTH / 2)) / (LENGTH / 2);
+			}
+			glBlendFunc(GL_DST_COLOR, GL_ZERO);
+			glBindTexture(GL_TEXTURE_2D, texture_char[4]);
+
+			glBegin(GL_QUADS);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glTexCoord2f((grass + 0) / 3.0f, 0.99f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);		// Top Left Of Player
+			glTexCoord2f((grass + 1) / 3.0f, 0.99f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);		// Top Right Of Player
+			glTexCoord2f((grass + 1) / 3.0f, 0.50f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);		// Bottom Right Of Player
+			glTexCoord2f((grass + 0) / 3.0f, 0.50f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);		// Bottom Left Of Player
+			glEnd();
+
+			glBlendFunc(GL_ONE, GL_ONE);
+
+			glBegin(GL_QUADS);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			glTexCoord2f((grass + 0) / 3.0f, 0.49f); glVertex2d(-LENGTH / 2.0, -LENGTH / 2.0);		// Top Left Of Player
+			glTexCoord2f((grass + 1) / 3.0f, 0.49f); glVertex2d(LENGTH / 2.0, -LENGTH / 2.0);		// Top Right Of Player
+			glTexCoord2f((grass + 1) / 3.0f, 0.0f); glVertex2d(LENGTH / 2.0, LENGTH / 2.0);		// Bottom Right Of Player
+			glTexCoord2f((grass + 0) / 3.0f, 0.0f); glVertex2d(-LENGTH / 2.0, LENGTH / 2.0);		// Bottom Left Of Player
+			glEnd();
+		}
+
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
+
+		if (isMenuOn)
+		{
+			glLoadIdentity();
+			glTranslatef(12.5 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
+			glBindTexture(GL_TEXTURE_2D, texture_window[0]);
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 4 / 2, -LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 4 / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 4 / 2, LENGTH * (HORIZONTAL_LINE + 1) / 2);
+			glEnd();
+
+			glLoadIdentity();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_DST_COLOR, GL_ZERO);
+			glBindTexture(GL_TEXTURE_2D, texture_font[0]);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			// 화살표
+			glPrint(START_X + arrow.x * LENGTH,
+				START_Y + (arrow.y + 0.5)* LENGTH, 1,
+				"/");
+			// 메뉴
+			glPrint(11.5 * LENGTH + START_X * 1.0f,
+				0.5 * LENGTH + START_Y * 1.0f, 0,
+				"Player");
+			glPrint(11.5 * LENGTH + START_X * 1.0f,
+				1.5 * LENGTH + START_Y * 1.0f, 0,
+				"Exit");
+
+			glDisable(GL_BLEND);
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 	if (Talk)
 	{
@@ -306,6 +309,39 @@ int DrawGLScene(GLvoid)
 			6.5 * LENGTH + START_Y * 1.0f, 0,
 			"No");
 
+		glDisable(GL_BLEND);
+		glDisable(GL_TEXTURE_2D);
+	}
+	if (battle) {
+		glLoadIdentity();
+		glEnable(GL_TEXTURE_2D);
+		glTranslatef(7 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[1]);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * (VERTICLE_LINE + 1) / 2, LENGTH * 3 / 2);
+		glEnd();
+
+		glLoadIdentity();
+		glTranslatef(11.5 * LENGTH + START_X * 1.0f, 9 * LENGTH + START_Y * 1.0f, 0.0f);
+		glBindTexture(GL_TEXTURE_2D, texture_window[3]);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex2d(-LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 1.0f); glVertex2d(LENGTH * 6 / 2, -LENGTH * 3 / 2);
+		glTexCoord2f(1.0f, 0.0f); glVertex2d(LENGTH * 6 / 2, LENGTH * 3 / 2);
+		glTexCoord2f(0.0f, 0.0f); glVertex2d(-LENGTH * 6 / 2, LENGTH * 3 / 2);
+		glEnd();
+
+		glLoadIdentity();
+		glEnable(GL_BLEND);
+		glPrint(9.5 * LENGTH + START_X * 1.0f,
+			8.5 * LENGTH + START_Y * 1.0f, 1,
+			"FIGHT  $&");
+		glPrint(9.5 * LENGTH + START_X * 1.0f,
+			9.5 * LENGTH + START_Y * 1.0f, 0,
+			"PACK   RUN");
 		glDisable(GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
 	}

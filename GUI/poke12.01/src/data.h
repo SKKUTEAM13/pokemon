@@ -1,12 +1,13 @@
 #pragma once
 
-#define START_X 30			// Start Map point Left Top
-#define START_Y 60
-#define NUM_CHARACTER_IMAGE 23
-#define NUM_MAP_IMAGE 5
-#define NUM_WINDOW_IMAGE 4
-#define NUM_INTRO_IMAGE 6
-#define NUM_BGM 5
+#define START_X				30
+#define START_Y				60
+#define NUM_CHARACTER_IMAGE 23	// 캐릭터 이미지 갯수
+#define NUM_MAP_IMAGE		5	// 맵 이미지 갯수
+#define NUM_WINDOW_IMAGE	4	// 테두리 등 User interface 갯수
+#define NUM_INTRO_IMAGE		6	// 
+#define NUM_BGM				5
+#define NUM_STORY			8
 
 // 데이터 //
 // 폰트 //
@@ -148,11 +149,11 @@ struct Story {
 	const char data[30];
 };
 
-Story talk_poke[8] =
+Story talk_poke[NUM_STORY] =
 // 0 //
 { { 1, 1, 0, "Pika?" },
 { 0, 0, 0, "Pikachu!" },
-{ 3, 3, 1, "Welcom to CENTER!" },
+{ 3, 3, 1, "Welcome to CENTER!" },
 { 4, 5, 2, "back to perfect!" },
 { 5, 6, 1, "health." },
 // 5 //
