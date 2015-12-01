@@ -15,6 +15,8 @@ GLuint	texture_map[NUM_MAP_IMAGE];					// 맵 이미지 저장
 GLuint	texture_window[NUM_WINDOW_IMAGE];
 GLuint	texture_intro[NUM_INTRO_IMAGE];
 GLuint	texture_font[1];
+GLuint	texture_back[1];
+GLuint	texture_front[NUM_BATTLE_IMAGE];
 GLuint	base;
 
 LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
@@ -59,18 +61,18 @@ bool RegisterTextures(GLuint *texture, int NUM_IMAGE, char(*path)[63])
 int LoadGLTextures()										// Load Bitmaps And Convert To Textures
 {
 	bool check = true;
+	// 배틀 앞모습
+	check = check & RegisterTextures(texture_front, NUM_BATTLE_IMAGE, path_front);
+	// 배틀 뒷모습
+	check = check & RegisterTextures(texture_back, 1, path_back);
 	// 폰트
 	check = check & RegisterTextures(texture_font, 1, path_font);
-
 	// 캐릭터
 	check = check & RegisterTextures(texture_char, NUM_CHARACTER_IMAGE, path_char);
-
 	// map
 	check = check & RegisterTextures(texture_map, NUM_MAP_IMAGE, path_map);
-
 	// intro
 	check = check & RegisterTextures(texture_intro, NUM_INTRO_IMAGE, path_intro);
-
 	// window
 	check = check & RegisterTextures(texture_window, NUM_WINDOW_IMAGE, path_window);
 

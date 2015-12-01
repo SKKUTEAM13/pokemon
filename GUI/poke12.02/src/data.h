@@ -9,6 +9,7 @@
 #define NUM_BGM				5
 #define NUM_STORY			10
 #define NUM_TOTAL_NPC		5
+#define NUM_BATTLE_IMAGE	2
 
 int		adjust = 0;									// 속도 조절
 int		steps[6] = { 1, 2, 4, 5, 10, 20 };			// 한번에 실행할 픽셀 수 조절. adjust로 정함.
@@ -35,8 +36,11 @@ bool	OK = false;					// 사용자가 글을 읽고 보내는 키입력
 pokemap	Map;
 
 // 데이터 //
-// 폰트 //
-char path_font[1][63] = { { "image/font/font.bmp" } };
+// 배틀용 이미지 //
+char path_back[1][63] = { { "image/battle/pika0.bmp" } };
+char path_front[NUM_BATTLE_IMAGE][63] = 
+{ {"image/battle/gugu1.bmp"},
+{ "image/battle/aboc1.bmp" } };
 // 캐릭터 //
 char path_char[NUM_CHARACTER_IMAGE][63] =
 // 0 //
@@ -90,6 +94,8 @@ char path_intro[NUM_INTRO_IMAGE][63] =
 { "image/intro/intro4.bmp" },
 { "image/intro/intro5.bmp" },
 { "image/intro/intro6.bmp" } };
+// 폰트 //
+char path_font[1][63] = { { "image/font/font.bmp" } };
 // 윈도우 //
 char path_window[NUM_WINDOW_IMAGE][63] =
 // 0 //

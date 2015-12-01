@@ -14,7 +14,6 @@
 #include <string>
 #include "SOIL.h"			// Header File For Loading BMP Image
 
-
 int		loop1;				// Generic Loop1
 int		loop2;				// Generic Loop2
 
@@ -30,16 +29,14 @@ int		loop2;				// Generic Loop2
 people	player;										// 플레이어 선언
 object	arrow;
 timer	Timer;
-
 /* 우리의 희망 */
 Pikachu pika(5);
-GuGu	gugu(15);
+GuGu	gugu(2);
 GuGu	rocket1(4);
 
 battleHandler	War;
 NPCHandler		CurrentNPC;
 glHandler		gl;
-/* 화살표, 화살표 움직일 맵 */
 
 //////////////////// 음악 재생 함수/////////////////
 MCI_OPEN_PARMS      mciOpen; //음악 파일을 로드
@@ -174,7 +171,7 @@ int DrawGLScene(GLvoid)
 			gl.Print2DTextureQUADS(VERTICLE_LINE + 1, 3);
 			// 현재 NPC로부터 얻은 대사 출력
 			gl.SetFontInit(texture_font[0]);
-			glPrint(1.5 * LENGTH + START_X * 1.0f,
+			glPrint(1.0 * LENGTH + START_X * 1.0f,
 				8.8 * LENGTH + START_Y * 1.0f, 1,
 				CurrentNPC.GetData());
 			glDisable(GL_BLEND); glDisable(GL_TEXTURE_2D);
@@ -205,8 +202,17 @@ int DrawGLScene(GLvoid)
 		glLoadIdentity();
 		glTranslatef(7 * LENGTH + START_X * 1.0f, 5 * LENGTH + START_Y * 1.0f, 0.0f);
 		gl.PrintQUADS(VERTICLE_LINE + 1, HORIZONTAL_LINE + 1);
+		glEnable(GL_TEXTURE_2D);
+		// 피카츄 뒷모습
+		glLoadIdentity();
+		gl.Set2DTexture(texture_back[0], 2.5, 5.5);
+		gl.Print2DTextureQUADS(3, 3);
+		// 적 포켓몬 앞모습
+		glLoadIdentity();
+		gl.Set2DTexture(texture_front[1], 11.5, 2);
+		gl.Print2DTextureQUADS(4, 4);
 		// 피카츄 상태창 배경
-		glLoadIdentity(); glEnable(GL_TEXTURE_2D);
+		glLoadIdentity();
 		gl.Set2DTexture(texture_window[5], 11.5, 5.5);
 		gl.Print2DTextureQUADS(5, 2);
 		// 적 포켓몬 상태창 배경
@@ -218,17 +224,20 @@ int DrawGLScene(GLvoid)
 		// 적 포켓몬 이름, 레벨, HP
 		glPrint(0.5 * LENGTH + START_X * 1.0f,
 				0.0 * LENGTH + START_Y * 1.0f, 0,
-				"%s|%d", gugu.getName(), 2);
+				"%s|%d", gugu.getName(), gugu.getLevel());
 		glPrint(0.8 * LENGTH + START_X * 1.0f,
 				1.0 * LENGTH + START_Y * 1.0f, 0,
 				"%d/ %d", gugu.getVital(), gugu.getFullVital());
 		// 피카츄 이름, 레벨, HP
 		glPrint(9.5 * LENGTH + START_X * 1.0f,
 				4.5 * LENGTH + START_Y * 1.0f, 0,
-				"%s|%d", pika.getName(), 5);
+				"%s|%d", pika.getName(), pika.getLevel());
 		glPrint(9.9 * LENGTH + START_X * 1.0f,	
-				5.6 * LENGTH + START_Y * 1.0f, 0, 
+				5.4 * LENGTH + START_Y * 1.0f, 0, 
 				"%d/ %d", pika.getVital(), pika.getFullVital());
+		glPrint(9.9 * LENGTH + START_X * 1.0f,
+				5.9 * LENGTH + START_Y * 1.0f, 0,
+				"%d/ %d", pika.getCurExp(), pika.getLimitExp());
 		glDisable(GL_BLEND); glDisable(GL_TEXTURE_2D);
 		// 밑에 깔릴 대화창 배경
 		glLoadIdentity(); glEnable(GL_TEXTURE_2D);
@@ -295,26 +304,26 @@ int DrawGLScene(GLvoid)
 			}
 			// 선공
 			else if (BattleTalk == 2) {
-				glPrint(1.5 * LENGTH + START_X * 1.0f,
+				glPrint(1.0 * LENGTH + START_X * 1.0f,
 						8.8 * LENGTH + START_Y * 1.0f, 1,
 						"%s used %s", pika.getName(), pika.getSkill(Answer + 4));
 			}
 			// 후공
 			else if (BattleTalk == 3) {
-				glPrint(1.5 * LENGTH + START_X * 1.0f,
+				glPrint(1.0 * LENGTH + START_X * 1.0f,
 						8.8 * LENGTH + START_Y * 1.0f, 1,
 						"%s used %s", gugu.getName(), gugu.getSkill(RamdomSkill));
 			}
 			else if (BattleTalk == 4) {
 				// 게임 오버
 				if (gameover) {
-					glPrint(1.5 * LENGTH + START_X * 1.0f,
+					glPrint(1.0 * LENGTH + START_X * 1.0f,
 							8.8 * LENGTH + START_Y * 1.0f, 1,
 							"I have no other pokemon");
 				}
 				// 이김
 				else {
-					glPrint(1.5 * LENGTH + START_X * 1.0f,
+					glPrint(1.0 * LENGTH + START_X * 1.0f,
 							8.8 * LENGTH + START_Y * 1.0f, 1,
 							"%s was defeated!", gugu.getName());
 				}

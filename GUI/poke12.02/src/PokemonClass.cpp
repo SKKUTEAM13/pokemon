@@ -42,6 +42,10 @@ void Pokemon::Damaged(int damage) {
 void Pokemon::Heal() {
 	vital = fullVital;
 }
+
+int Pokemon::getCurExp() { return curExp; }
+int Pokemon::getLimitExp() { return limitExp; }
+int Pokemon::getLevel() { return level; }
 int Pokemon::getAttack() { return attack; }
 int Pokemon::getVital() { return vital; }
 int Pokemon::getDefense() { return defense; }
@@ -74,7 +78,7 @@ int Pikachu::SecondSkill(char skillName[]) // µÎ¹øÂ° ½ºÅ³ ±âº» µ¥¹ÌÁö¿Í ÀÌ¸§ ¹ÝÈ
 
 ///// ±¸±¸ Å¬·¡½º ÇÔ¼ö Á¤ÀÇ
 
-GuGu::GuGu(int level) : Pokemon(60, 50, 30, 60, level, "GuGu", "Wind", "First attack") { }
+GuGu::GuGu(int level) : Pokemon(60, 50, 30, 60, level, "Arbok", "Bite", "First attack") { }
 
 int GuGu::FirstSkill(char skillName[])
 {
