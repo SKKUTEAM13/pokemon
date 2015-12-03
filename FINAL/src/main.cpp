@@ -345,7 +345,7 @@ int DrawGLScene(GLvoid)
 				if (gameover) {
 					glPrint(1.0 * LENGTH + START_X * 1.0f,
 							8.8 * LENGTH + START_Y * 1.0f, 1,
-							"I have no other pokemons to fight for me!");
+							"I have no other pokemons!");
 				}
 				// ÀÌ±ט
 				else {
@@ -353,6 +353,12 @@ int DrawGLScene(GLvoid)
 							8.8 * LENGTH + START_Y * 1.0f, 1,
 							"The Enemy was defeated!", gugu->getName());
 				}
+			}
+			else if (BattleTalk == 7) {
+				glPrint(1.0 * LENGTH + START_X * 1.0f,
+					8.8 * LENGTH + START_Y * 1.0f, 1,
+					"My Pikachu fainted!", pika.getAddExp());
+
 			}
 			glDisable(GL_BLEND); glDisable(GL_TEXTURE_2D);
 		}
@@ -676,10 +682,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						if (BattleTalk == 3) {
 							RamdomSkill = GenRand(1, 2);
 							War.opponentTurn(&pika, gugu, RamdomSkill);
-							if (0 >= pika.getVital()) {
-								BattleTalk = 4;
-								gameover = true;
-							}
+							
 							OK = false;
 							Answer = -1;
 						}
@@ -758,7 +761,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								if (0 >= gugu->getVital()) {
 									BattleTalk = 4;
 									OK = false;
-									pika.ExpUp();
+									
 								}
 								else {
 									mciSendCommand(8, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
@@ -767,15 +770,20 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								}
 							}
 							else if (BattleTalk == 3) {
-								OK = true;
-								BattleTalk--;
-
+								if(0 >= pika.getVital()) {
+									BattleTalk = 7;
+									gameover = true;
+								}
+								else {	
+									OK = true;
+									BattleTalk--;
+								}
 								arrow.SetObjects(9, 8);
 							}
 							else if (BattleTalk == 4) {
+								pika.ExpUp();
 								OK = false;
 								BattleTalk = 5;
-
 								mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
 								nowplaying = 7;
@@ -783,6 +791,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								
 							}
 							else if (BattleTalk == 5) {
+
 								OK = false;
 								BattleTalk = 6;
 							}
@@ -828,6 +837,10 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
 								nowplaying = BGM_map[Map.map_number] + 1;
 								mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+							}
+							else if (BattleTalk == 7) {
+								OK = false;
+								BattleTalk = 6;
 							}
 						}
 					}
@@ -884,7 +897,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						{
 							if (GenRand(0, 3) == 3) {
 								MEET = false;
-								CurrentBattlePoke = GenRand(1, 2) + Map.map_number;
+								CurrentBattlePoke = GenRand(1,2) + Map.map_number;
 								gugu = War.selectPoke(2 * CurrentBattlePoke, CurrentBattlePoke);
 								interrupt = battle = true;
 
