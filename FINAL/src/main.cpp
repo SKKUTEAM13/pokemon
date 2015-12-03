@@ -786,6 +786,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								OK = false;
 								BattleTalk = 6;
 							}
+							// 배틀 끝
 							else if (BattleTalk == 6) {
 								delete gugu;
 								BattleTalk = 0;
@@ -799,7 +800,9 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 									*	전에 싸우던 상대방 NoNext, HP 리셋, 나의 HP 리셋
 									*	센터 앞으로 위치 리셋, 맵 리셋, npc 리셋
 									*/
-									CurrentNPC.SetNoNext();
+									if (player.tile != 1) {
+										CurrentNPC.SetNoNext();
+									}
 									Map.DeleteNPC();
 									pika.Heal();
 									gameover = Talk = false; 
@@ -813,20 +816,18 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								}
 								else {
 									interrupt = Talk = false;
-									CurrentNPC.SetYesNext();
+									if (player.tile != 1) {
+										CurrentNPC.SetYesNext();
+										CurrentNPC.SetDeletePoke();
+									}
 								}
-								
 								player.SetObjects(player.x, player.y);
 								Map.Loading_Map(map_DB[Map.map_number]);
-								if (player.tile != 1) {
-									Map.map_array[player.x][player.y] = 1;
-								}
+
 								mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
 								nowplaying = BGM_map[Map.map_number] + 1;
 								mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
-							
-
 							}
 						}
 					}
@@ -910,11 +911,16 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						if (player.Check_Stop() && Map.Check_Map(player.x, player.y) == 6)
 						{
 							TalkNPC = Map.map_array[player.x][player.y] / 10;
-							wait = 8;
-							keys['Z'] = true;
-							CountLoop = 0;
-							Talk = true;
-							Answer = -1;
+							if (CurrentNPC.GetSelect() != 0) {
+								wait = 8;
+								//keys['Z'] = true;
+								CountLoop = 0;
+								interrupt = Talk = true;
+								Answer = -1;
+							}
+							else {
+								Map.map_array[player.x][player.y] = 1;
+							}
 						}
 						else
 						{
