@@ -6,7 +6,7 @@ using namespace std;
 ///////////±âº» Æ÷ÄÏ¸ó Å¬·¡½º ÇÔ¼ö Á¤ÀÇ 
 
 Pokemon::Pokemon(int vital, int attack, int defense, int fullVital, int level, char * name, char * skillName1, char * skillName2)
-	: vital(vital + level * 3), attack(attack + (attack*level) / 10), fullVital(vital + level * 3), defense(defense + level), curExp(0), level(level)
+	: vital(vital + level * 3), attack(attack + level*2), fullVital(vital + level * 3), defense(defense + level), curExp(0), level(level)
 {
 	strcpy(this->name, name);
 	strcpy(this->skillSeries[0], skillName1);
@@ -33,10 +33,10 @@ int Pokemon::ExpUp(void) { // °áÅõ ½Â¸® ÈÄ °æÇèÄ¡ Áõ°¡
 void Pokemon::levelUp(int overExp) // ·¹º§¾÷! (overExp : ÃÊ°úÇÑ °æÇèÄ¡)
 {
 	level++;
-	defense ++;
+	defense += 2;
 	fullVital += (level / 2);
 	vital = fullVital;
-	attack = (attack*11) / 10;
+	attack += level;
 	curExp = overExp;
 	addExp = 10 + 2 * level;
 	limitExp = 10 * level;
@@ -75,7 +75,7 @@ char * Pokemon::getName() { return name; }
 int Pokemon::FirstSkill(char skillName[])  // Ã¹¹øÂ° ½ºÅ³ ±âº» µ¥¹ÌÁö¿Í ÀÌ¸§ ¹İÈ¯
 {
 	srand(time(NULL));
-	int variable = rand() % 7 - 3;
+	int variable = rand() % 12 - 6;
 	strcpy(skillName, getSkill(1));
 	int damage = getAttack() + variable;
 	return damage;
@@ -85,8 +85,9 @@ int Pokemon::FirstSkill(char skillName[])  // Ã¹¹øÂ° ½ºÅ³ ±âº» µ¥¹ÌÁö¿Í ÀÌ¸§ ¹İÈ
 int Pokemon::SecondSkill(char skillName[]) // µÎ¹øÂ° ½ºÅ³ ±âº» µ¥¹ÌÁö¿Í ÀÌ¸§ ¹İÈ¯
 {
 	srand(time(NULL));
+	int variable = rand() % 5 - 2;
 	strcpy(skillName, getSkill(2));
-	int damage = getAttack();
+	int damage = getAttack() + variable;
 	return damage;
 }
 
@@ -129,7 +130,7 @@ Yungela::Yungela(int level) : Pokemon(60, 45, 25, 60, level, "Yungela", "Psychic
 Parasect::Parasect(int level) : Pokemon(70, 35, 40, 70, level, "Parasect", "Mushroom Spore", "Leaf Attack") { }
 
 
-Dandangi::Dandangi(int level) : Pokemon(25, 5, 80, 25, level, "Dandangi", "Bite", "Slap") { }
+Dandangi::Dandangi(int level) : Pokemon(30, 10, 80, 40, level, "Dandangi", "Bite", "Slap") { }
 
 
 Majayong::Majayong(int level) : Pokemon(60, 40, 40, 60, level, "Majayong", "Counter", "Mirror Coat") { }

@@ -865,12 +865,6 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						else TalkNPC = -1;
 					}
 					else {
-						//방향키 입력 받으면 움직임
-						player.MovementByKeyInput(VK_LEFT);
-						player.MovementByKeyInput(VK_UP);
-						player.MovementByKeyInput(VK_RIGHT);
-						player.MovementByKeyInput(VK_DOWN);
-
 						if (player.Check_Stop() && (Map.Check_Map(player.x, player.y) == 3))
 						{
 							Map.DeleteNPC();
@@ -886,7 +880,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							}
 							CountLoop = 0;
 						}
-						if (player.Check_Stop() && MEET)//(GenRand(0, 3) == 3)
+						if (player.Check_Stop() && MEET)
 						{
 							if (GenRand(0, 3) == 3) {
 								MEET = false;
@@ -922,14 +916,21 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								Map.map_array[player.x][player.y] = 1;
 							}
 						}
-						else
-						{
-							player.WalkAnimation(CountLoop);
 
-							// Move player from (fx, fy) to (x, y)
-							player.MoveObject(steps[adjust], CountLoop);
-							CountLoop += steps[adjust];
-						}
+						//방향키 입력 받으면 움직임
+						player.MovementByKeyInput(VK_LEFT);
+						player.MovementByKeyInput(VK_UP);
+						player.MovementByKeyInput(VK_RIGHT);
+						player.MovementByKeyInput(VK_DOWN);
+
+
+
+						player.WalkAnimation(CountLoop);
+
+						// Move player from (fx, fy) to (x, y)
+						player.MoveObject(steps[adjust], CountLoop);
+						CountLoop += steps[adjust];
+
 					}
 				}
 			}
