@@ -12,10 +12,14 @@
 #include <Digitalv.h>
 #include <iostream>
 #include <string>
+#include <ctime>
+#include <cstdlib>
 #include "SOIL.h"			// Header File For Loading BMP Image
 
 int		loop1;				// Generic Loop1
 int		loop2;				// Generic Loop2
+
+#define GAMESPEED 5
 
 #include "object.h"
 #include "map.h"
@@ -33,9 +37,14 @@ timer	Timer;
 Pikachu pika(5);
 Pokemon * gugu;
 
+bool MEET = false;
+
+int CurrentBattlePoke = 0;
+
 battleHandler	War;
 NPCHandler		CurrentNPC;
 glHandler		gl;
+
 
 //////////////////// 음악 재생 함수/////////////////
 MCI_OPEN_PARMS      mciOpen; //음악 파일을 로드
@@ -66,6 +75,12 @@ DWORD LoadMP3(HWND hWnd, LPCTSTR lpszWave)
 		return Result;
 
 	return 0;
+}
+
+int GenRand(int m, int n)  // m에서 n까지
+{
+	srand(Timer.TimerGetTime());
+	return ((rand() % (n - m + 1)) + m);
 }
 
 int DrawGLScene(GLvoid)
@@ -208,7 +223,7 @@ int DrawGLScene(GLvoid)
 		gl.Print2DTextureQUADS(3, 3);
 		// 적 포켓몬 앞모습
 		glLoadIdentity();
-		gl.Set2DTexture(texture_front[CurrentNPC.GetSelect() - 1], 11.5, 2);
+		gl.Set2DTexture(texture_front[CurrentBattlePoke - 1], 11.5, 2);
 		gl.Print2DTextureQUADS(4, 4);
 		// 피카츄 상태창 배경
 		glLoadIdentity();
@@ -297,7 +312,7 @@ int DrawGLScene(GLvoid)
 			gl.SetFontInit(texture_font[0]);
 			// 전투 시작
 			if (BattleTalk == 1) {
-				glPrint(1.5 * LENGTH + START_X * 1.0f,
+				glPrint(1.0 * LENGTH + START_X * 1.0f,
 						8.8 * LENGTH + START_Y * 1.0f, 1,
 						"The Enemy sent out %s!", gugu->getName());
 			}
@@ -311,7 +326,7 @@ int DrawGLScene(GLvoid)
 			else if (BattleTalk == 3) {
 				glPrint(1.0 * LENGTH + START_X * 1.0f,
 						8.8 * LENGTH + START_Y * 1.0f, 1,
-						"%s used %s", gugu->getName(), gugu->getSkill(RamdomSkill));
+						"%s used %s!", gugu->getName(), gugu->getSkill(RamdomSkill));
 			}
 			else if (BattleTalk == 4) {
 				glPrint(1.0 * LENGTH + START_X * 1.0f,
@@ -387,7 +402,6 @@ void people::MovementByKeyInput(int VK_INPUT)
 		int DirectKey = VK_INPUT - VK_LEFT;
 		int X_DirectKey = (DirectKey - 1) % 2;
 		int Y_DirectKey = (DirectKey - 2) % 2;
-
 		if (!Check_Direct(DirectKey)) { return; }
 		else if (
 			(y + Y_DirectKey <= HORIZONTAL_LINE) &&						// 이동 후 좌표 맵범위 안쪽인 x가 0~14, y가 0~10인지 확인 
@@ -403,10 +417,12 @@ void people::MovementByKeyInput(int VK_INPUT)
 				return;
 			x += X_DirectKey;
 			y += Y_DirectKey;
+			MEET = false;
 			CountLoop = 0;
 			// 잔디 타일에 들어가면 캐릭터한테 잔디 애니메이션 추가
 			if (Map.Check_Map(x, y) == 2)
 			{
+				MEET = true;
 				tile = 1;
 			}
 			else { tile = 0; }
@@ -499,7 +515,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 				SwapBuffers(hDC);					// Swap Buffers (Double Buffering)
 			}
 
-			while (Timer.TimerGetTime() < start + float(steps[adjust] * 5.0f)) {}	// Waste Cycles On Fast Systems
+			while (Timer.TimerGetTime() < start + float(steps[adjust] * GAMESPEED * 1.0f)) {}	// Waste Cycles On Fast Systems
 
 			if (keys[VK_F1])						// Is F1 Being Pressed?
 			{
@@ -609,7 +625,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								{								
 									gugu = War.selectPoke(CurrentNPC.GetLevel(), CurrentNPC.GetSelect());
 									interrupt = battle = true;
-
+									CurrentBattlePoke = CurrentNPC.GetSelect();
 									mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 									mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
 									nowplaying = 6;
@@ -658,7 +674,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 					{
 						// 후공은 자동
 						if (BattleTalk == 3) {
-							RamdomSkill = (rand() % 2) + 1;
+							RamdomSkill = GenRand(1, 2);
 							War.opponentTurn(&pika, gugu, RamdomSkill);
 							if (0 >= pika.getVital()) {
 								BattleTalk = 4;
@@ -693,6 +709,8 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							if (OK && (Answer == -3 || Answer == -2)) {
 								// 스킬 선택 했으면
 								if (BattleTalk == 2) {
+									mciSendCommand(8, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
+									mciSendCommand(8, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 									skill = false;
 									War.playerTurn(&pika, gugu, Answer + 3);
 									
@@ -731,19 +749,27 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							if (BattleTalk == 1) {
 								OK = true;
 								BattleTalk++;
+								
 							}
 							else if (BattleTalk == 2) {
 								OK = true;
 								BattleTalk++;
+								
 								if (0 >= gugu->getVital()) {
 									BattleTalk = 4;
-									pika.ExpUp();
 									OK = false;
+									pika.ExpUp();
+								}
+								else {
+									mciSendCommand(8, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
+									mciSendCommand(8, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+
 								}
 							}
 							else if (BattleTalk == 3) {
 								OK = true;
 								BattleTalk--;
+
 								arrow.SetObjects(9, 8);
 							}
 							else if (BattleTalk == 4) {
@@ -783,7 +809,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 									player.direct = 3; 
 									player.x = 8; 
 									player.y = 5;
-									
+									player.tile = 0;
 								}
 								else {
 									interrupt = Talk = false;
@@ -792,8 +818,9 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 								
 								player.SetObjects(player.x, player.y);
 								Map.Loading_Map(map_DB[Map.map_number]);
-								Map.map_array[player.x][player.y] = 1;
-
+								if (player.tile != 1) {
+									Map.map_array[player.x][player.y] = 1;
+								}
 								mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
 								nowplaying = BGM_map[Map.map_number] + 1;
@@ -843,7 +870,7 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 						player.MovementByKeyInput(VK_RIGHT);
 						player.MovementByKeyInput(VK_DOWN);
 
-						if (player.Check_Stop() && Map.Check_Map(player.x, player.y) == 3)
+						if (player.Check_Stop() && (Map.Check_Map(player.x, player.y) == 3))
 						{
 							Map.DeleteNPC();
 							Map.Link_Map(&(player.x), &(player.y));
@@ -858,22 +885,29 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 							}
 							CountLoop = 0;
 						}
-						else if (rand() % 10 == 9 && (player.Check_Stop() && Map.Check_Map(player.x, player.y) == 2))
+						if (player.Check_Stop() && MEET)//(GenRand(0, 3) == 3)
 						{
-							gugu = War.selectPoke(Map.map_number + 2, rand() % 2 + Map.map_number + 1);
-							interrupt = battle = true;
+							if (GenRand(0, 3) == 3) {
+								MEET = false;
+								CurrentBattlePoke = GenRand(1, 2) + Map.map_number;
+								gugu = War.selectPoke(2 * CurrentBattlePoke, CurrentBattlePoke);
+								interrupt = battle = true;
 
-							mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
-							mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
-							nowplaying = 6;
-							mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+								mciSendCommand(nowplaying, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
+								mciSendCommand(nowplaying, MCI_SEEK, MCI_SEEK_TO_START, (DWORD)(LPVOID)&mciPlay);
+								nowplaying = 6;
+								mciSendCommand(nowplaying, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlay);
 
-							OK = false;
-							BattleTalk = 1;
-							arrow.SetObjects(9, 8);
-							Map.Loading_Map(list_DB[0]);
+								OK = false;
+								BattleTalk = 1;
+								arrow.SetObjects(9, 8);
+								Map.Loading_Map(list_DB[0]);
+							}
+							else {
+								MEET = false;
+							}
 						}
-						else if (player.Check_Stop() && Map.Check_Map(player.x, player.y) == 6)
+						if (player.Check_Stop() && Map.Check_Map(player.x, player.y) == 6)
 						{
 							TalkNPC = Map.map_array[player.x][player.y] / 10;
 							wait = 8;

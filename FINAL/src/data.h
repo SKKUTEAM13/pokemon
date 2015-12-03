@@ -53,7 +53,7 @@ char path_front[NUM_BATTLE_IMAGE][63] =
 { "image/battle/yungela1.bmp" },
 // 10 //
 { "image/battle/parasect1.bmp" },
-{ "image/battle/dandangi1.bmp" },
+{ "image/battle/dandanji1.bmp" },
 { "image/battle/majayong1.bmp" },
 { "image/battle/ddodogas1.bmp" },
 { "image/battle/dactrio1.bmp" },

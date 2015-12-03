@@ -82,7 +82,6 @@ void people::SetObjects(int x, int y)
 	fy = LENGTH * y;
 	animation = 0;
 	IsLeft = false;
-	tile = 0;
 	IsWalk = false;
 }
 // 픽셀좌표계에서 움직이는 객체가 원하는 위치까지 움직였는가?
