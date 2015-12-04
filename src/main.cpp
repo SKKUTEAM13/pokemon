@@ -554,9 +554,10 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 
 							// 게임 셋팅
 							Map.IsMap = true;
-							Map.Loading_Map(map_DB[0]);
-							player.SetObjects(3, 2);
-							Map.map_number = 0;
+							Map.Loading_Map(map_DB[2]);
+							//211033
+							player.SetObjects(11, 4);
+							Map.map_number = 2;
 							animation = 0;
 							CountLoop = LENGTH;
 						}
